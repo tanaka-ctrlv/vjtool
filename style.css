@@ -1,0 +1,254 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  background: black;
+}
+
+canvas {
+  display: block;
+}
+
+/* INTRO SCREEN */
+
+#intro-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: black;
+  color: white;
+}
+
+.intro-card {
+  width: min(520px, 100%);
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 28px;
+  padding: 36px 32px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.eyebrow {
+  margin: 0 0 12px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+h1 {
+  margin: 0 0 16px;
+  font-size: clamp(36px, 7vw, 72px);
+  line-height: 0.95;
+  font-weight: 400;
+}
+
+.intro-card p {
+  line-height: 1.45;
+}
+
+#enter-button {
+  margin-top: 18px;
+  border: 1px solid white;
+  border-radius: 999px;
+  background: white;
+  color: black;
+  padding: 12px 22px;
+  font: inherit;
+  cursor: pointer;
+}
+
+#enter-button:hover {
+  opacity: 0.78;
+}
+
+.small-note {
+  margin-top: 18px;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+/* CONTROL PANEL */
+
+#control-panel {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.01em;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  max-width: calc(100vw - 32px);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+body.dark-canvas #control-panel {
+  color: white;
+  background: rgba(0, 0, 0, 0.46);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+body.light-canvas #control-panel {
+  color: black;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(0, 0, 0, 0.18);
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.control-label {
+  opacity: 0.75;
+}
+
+.shape-group {
+  gap: 6px;
+}
+
+.shape-button,
+.pill-button,
+.small-select {
+  color: inherit;
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 6px 9px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.shape-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 38px;
+  justify-content: center;
+}
+
+.shape-button:hover,
+.pill-button:hover,
+.small-select:hover {
+  opacity: 0.72;
+}
+
+.shape-button.active {
+  background: currentColor;
+}
+
+body.dark-canvas .shape-button.active {
+  color: black;
+}
+
+body.light-canvas .shape-button.active {
+  color: white;
+}
+
+.choice-dot {
+  width: 7px;
+  height: 7px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.shape-button.active .choice-dot {
+  background: currentColor;
+}
+
+.shape-icon {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.sound-slider {
+  width: 110px;
+  cursor: pointer;
+}
+
+.small-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 20px;
+}
+
+.pill-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.about-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.about-text {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 280px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  line-height: 1.35;
+}
+
+body.dark-canvas .about-text {
+  color: white;
+  background: rgba(0, 0, 0, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+body.light-canvas .about-text {
+  color: black;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.18);
+}
+
+.about-wrap:hover .about-text {
+  display: block;
+}
+
+.fullscreen-note {
+  width: 100%;
+  text-align: center;
+  font-size: 11px;
+  opacity: 0.65;
+  margin-top: -2px;
+}
+
+@media (max-width: 800px) {
+  #control-panel {
+    border-radius: 24px;
+  }
+
+  .sound-slider {
+    width: 90px;
+  }
+}
