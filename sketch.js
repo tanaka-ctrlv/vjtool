@@ -29,7 +29,7 @@ let isRecording = false;
 let lastAutoSaveTime = 0;
 let captureCount = 0;
 
-// SOUND START STATE
+// APP STATE
 let soundReady = false;
 let toolEntered = false;
 
@@ -39,11 +39,12 @@ function setup() {
   ellipseMode(CENTER);
 
   setupSound();
-  setupEnterButton();
   setupInterface();
+  setupEnterButton();
 
   applyInterfaceTheme();
 
+  // Hide the tool controls until the intro button is clicked.
   uiPanel.hide();
 }
 
@@ -61,17 +62,26 @@ function draw() {
 }
 
 function setupEnterButton() {
-  let enterButton = select("#enter-button");
+  let enterButton = document.getElementById("enter-button");
 
-  enterButton.mousePressed(function () {
-    let introScreen = select("#intro-screen");
+  if (!enterButton) {
+    console.log("Enter button not found.");
+    return;
+  }
+
+  enterButton.addEventListener("click", function () {
+    let introScreen = document.getElementById("intro-screen");
 
     if (introScreen) {
-      introScreen.hide();
+      introScreen.style.display = "none";
     }
 
     toolEntered = true;
-    uiPanel.show();
+
+    if (uiPanel) {
+      uiPanel.show();
+    }
+
     startListening();
   });
 }
@@ -80,13 +90,14 @@ function setupSound() {
   mic = new p5.AudioIn();
   fft = new p5.FFT(0.8, 1024);
 
-  window.addEventListener("pointerdown", startListening);
+  // Microphone starts only after pressing Enter Tool.
+  // This keeps the browser permission flow cleaner.
 }
 
 function startListening() {
   if (soundReady) return;
 
-  // Safer audio start for different p5 / p5.sound versions
+  // Safer audio start for different p5 / p5.sound versions.
   if (typeof userStartAudio === "function") {
     userStartAudio();
   } else if (typeof getAudioContext === "function") {
@@ -97,6 +108,7 @@ function startListening() {
     function () {
       fft.setInput(mic);
       soundReady = true;
+      console.log("Microphone started.");
     },
     function () {
       console.log("Microphone could not start.");
@@ -109,15 +121,20 @@ function updateSound() {
 
   fft.analyze();
 
+  // Fixed sound band keeps the interface simpler.
   let bandEnergy = fft.getEnergy("mid");
 
   smoothBandEnergy = lerp(smoothBandEnergy, bandEnergy, 0.12);
 }
 
 function getSoundResponse() {
+  if (!soundResponseSlider) {
+    return 0;
+  }
+
   let sensitivity = soundResponseSlider.value();
 
-  // Higher slider value = more responsive drawing
+  // Higher slider value = more responsive drawing.
   let threshold = map(sensitivity, 0, 100, 220, 20);
 
   let reactiveEnergy = max(0, smoothBandEnergy - threshold);
@@ -148,6 +165,8 @@ function drawSoundForms(expansion) {
   let tileWidth = width / tileCountX;
   let tileHeight = height / tileCountY;
 
+  // Spacing is automatic.
+  // Quieter input feels more open; louder input becomes denser.
   let spacing = map(expansion, 0, 1, 16, 4);
 
   let innerW = max(4, tileWidth - spacing);
@@ -160,6 +179,8 @@ function drawSoundForms(expansion) {
   let offsetY = -(tileCountY * tileHeight) / 2;
 
   let maxD = dist(-width / 2, -height / 2, 0, 0);
+
+  // Gives the drawing a visible center even when the room is quiet.
   let activeRadius = map(expansion, 0, 1, maxD * 0.18, maxD);
 
   for (let gridY = 0; gridY < tileCountY; gridY++) {
@@ -241,14 +262,17 @@ function drawLineFan(w, h) {
           x2 += w / count;
           y2 = 0;
           break;
+
         case 1:
           x2 = w;
           y2 += h / count;
           break;
+
         case 2:
           x2 -= w / count;
           y2 = h;
           break;
+
         case 3:
           x2 = 0;
           y2 -= h / count;
@@ -331,7 +355,12 @@ function setupInterface() {
 
   for (let s of shapes) {
     let btn = createButton("");
-    btn.html('<span class="choice-dot"></span><span class="shape-icon">' + s.icon + "</span>");
+    btn.html(
+      '<span class="choice-dot"></span><span class="shape-icon">' +
+        s.icon +
+        "</span>"
+    );
+
     btn.class("shape-button");
     btn.attribute("title", s.name);
     btn.parent(shapeGroup);
@@ -342,7 +371,10 @@ function setupInterface() {
       startListening();
     });
 
-    shapeButtons.push({ button: btn, name: s.name });
+    shapeButtons.push({
+      button: btn,
+      name: s.name
+    });
   }
 
   let responseGroup = createDiv();
@@ -374,6 +406,7 @@ function setupInterface() {
   autoSaveSelect.option("every 10s", "10000");
   autoSaveSelect.selected("off");
   autoSaveSelect.parent(autoSaveGroup);
+
   autoSaveSelect.changed(function () {
     lastAutoSaveTime = millis();
   });
@@ -381,6 +414,7 @@ function setupInterface() {
   themeButton = createButton("Black bg / white marks");
   themeButton.class("pill-button");
   themeButton.parent(uiPanel);
+
   themeButton.mousePressed(function () {
     darkCanvas = !darkCanvas;
     applyInterfaceTheme();
@@ -411,7 +445,7 @@ function setupInterface() {
   aboutButton.parent(aboutWrap);
 
   let aboutText = createDiv(
-    "This is a sound-reactive form-making tool. Your microphone input gently changes how the pattern expands. Choose a form, adjust how responsive it feels, then save stills or recordings. Click once anywhere to wake the microphone."
+    "This is a sound-reactive form-making tool. Your microphone input gently changes how the pattern expands. Choose a form, adjust how responsive it feels, then save stills or recordings. Click Enter Tool to wake the microphone."
   );
   aboutText.class("about-text");
   aboutText.parent(aboutWrap);
@@ -452,6 +486,8 @@ function applyInterfaceTheme() {
 }
 
 function handleAutoFrameCapture() {
+  if (!autoSaveSelect) return;
+
   let interval = autoSaveSelect.value();
 
   if (interval === "off") return;
@@ -505,7 +541,10 @@ function startRecording() {
   };
 
   mediaRecorder.onstop = function () {
-    let blob = new Blob(recordedChunks, { type: "video/webm" });
+    let blob = new Blob(recordedChunks, {
+      type: "video/webm"
+    });
+
     let url = URL.createObjectURL(blob);
 
     let a = document.createElement("a");

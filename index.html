@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Sound-Form Generative Tool</title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- p5.js + p5.sound -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.sound.min.js"></script>
+</head>
+
+<body>
+  <main id="project-container">
+    <section id="intro-screen">
+      <div class="intro-card">
+        <p class="eyebrow">Sound-Form Generative Tool</p>
+
+        <h1>Draw with sound.</h1>
+
+        <p>
+          This tool uses microphone input to generate responsive visual forms.
+          Choose a form, adjust how reactive it feels, and save stills or recordings
+          of the drawings you create.
+        </p>
+
+        <button id="enter-button">Enter Tool</button>
+
+        <p class="small-note">
+          Please allow microphone access when prompted.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <script src="sketch.js"></script>
+</body>
+</html>
